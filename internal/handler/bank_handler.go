@@ -18,6 +18,11 @@ func NewBankHandler(s *service.BankService) *BankHandler {
 	return &BankHandler{bankService: s}
 }
 
+// bankResponse defines the expected JSON structure for bank endpoints.
+type bankPayload struct {
+	Stocks []domain.Stock `json:"stocks"`
+}
+
 // GetStocks handles the GET request to retrieve all stocks in the bank.
 func (h *BankHandler) GetStocks(w http.ResponseWriter, r *http.Request) {
 	stocks, err := h.bankService.GetStocks(r.Context())
@@ -30,18 +35,19 @@ func (h *BankHandler) GetStocks(w http.ResponseWriter, r *http.Request) {
 		stocks = []domain.Stock{}
 	}
 
-	respondWithJSON(w, http.StatusOK, stocks)
+	response := bankPayload{Stocks: stocks}
+	respondWithJSON(w, http.StatusOK, response)
 }
 
 // SetStocks handles the POST request to overwrite the bank's inventory.
 func (h *BankHandler) SetStocks(w http.ResponseWriter, r *http.Request) {
-	var stocks []domain.Stock
-	if err := json.NewDecoder(r.Body).Decode(&stocks); err != nil {
+	var payload bankPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		respondWithJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid request payload"})
 		return
 	}
 
-	err := h.bankService.SetStocks(r.Context(), stocks)
+	err := h.bankService.SetStocks(r.Context(), payload.Stocks)
 	if err != nil {
 		respondWithError(w, err)
 		return
