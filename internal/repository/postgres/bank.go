@@ -98,8 +98,8 @@ func (r *BankRepository) GetStockQuantity(ctx context.Context, name string) (int
 	return quantity, nil
 }
 
-// UpdateStock modifies the quantity of a specific stock by a given delta.
-func (r *BankRepository) UpdateStock(ctx context.Context, name string, delta int) error {
+// UpdateStockQuantity modifies the quantity of a specific stock by a given delta.
+func (r *BankRepository) UpdateStockQuantity(ctx context.Context, name string, delta int) error {
 	query := `UPDATE bank_stocks SET quantity = quantity + $1 WHERE name = $2`
 
 	result, err := r.runner(ctx).ExecContext(ctx, query, delta, name)
