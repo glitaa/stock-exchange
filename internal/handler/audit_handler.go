@@ -17,6 +17,11 @@ func NewAuditHandler(s *service.AuditService) *AuditHandler {
 	return &AuditHandler{auditService: s}
 }
 
+// auditResponse defines the expected JSON structure for the audit log.
+type auditResponse struct {
+	Log []domain.LogEntry `json:"log"`
+}
+
 // GetLog handles the GET request to retrieve the full audit log.
 func (h *AuditHandler) GetLog(w http.ResponseWriter, r *http.Request) {
 	logs, err := h.auditService.GetLog(r.Context())
@@ -29,5 +34,6 @@ func (h *AuditHandler) GetLog(w http.ResponseWriter, r *http.Request) {
 		logs = []domain.LogEntry{}
 	}
 
-	respondWithJSON(w, http.StatusOK, logs)
+	response := auditResponse{Log: logs}
+	respondWithJSON(w, http.StatusOK, response)
 }
