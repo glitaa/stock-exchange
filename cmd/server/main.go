@@ -46,6 +46,7 @@ func main() {
 	walletHandler := handler.NewWalletHandler(walletService)
 	exchangeHandler := handler.NewExchangeHandler(exchangeService)
 	auditHandler := handler.NewAuditHandler(auditService)
+	chaosHandler := handler.NewChaosHandler()
 
 	mux := http.NewServeMux()
 
@@ -57,6 +58,8 @@ func main() {
 	mux.HandleFunc("GET /wallets/{wallet_id}", walletHandler.GetWallet)
 
 	mux.HandleFunc("GET /audit", auditHandler.GetLog)
+
+	mux.HandleFunc("POST /chaos", chaosHandler.Crash)
 
 	log.Printf("Server is running on port %s...", *port)
 	if err := http.ListenAndServe(":"+*port, mux); err != nil {
