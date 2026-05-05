@@ -56,6 +56,7 @@ func main() {
 	mux.HandleFunc("POST /stocks", bankHandler.SetStocks)
 
 	mux.HandleFunc("GET /wallets/{wallet_id}", walletHandler.GetWallet)
+	mux.HandleFunc("GET /wallets/{wallet_id}/stocks/{stock_name}", walletHandler.GetWalletStock)
 
 	mux.HandleFunc("GET /log", auditHandler.GetLog)
 
