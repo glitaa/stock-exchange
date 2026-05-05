@@ -10,7 +10,7 @@ const (
 
 // LogEntry represents a single record in the audit log.
 type LogEntry struct {
-	Type      OperationType
-	WalletID  string
-	StockName string
+	Type      OperationType `json:"type"`
+	WalletID  string        `json:"wallet_id"`
+	StockName string        `json:"stock_name"`
 }
