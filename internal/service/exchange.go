@@ -70,8 +70,16 @@ func (s *ExchangeService) SellStock(ctx context.Context, walletID, stockName str
 	}
 
 	return s.txManager.RunInTx(ctx, func(txCtx context.Context) error {
+		_, err := s.bankRepo.GetStockQuantity(txCtx, stockName)
+		if err != nil {
+			return err
+		}
+
 		walletQty, err := s.walletRepo.GetStockQuantity(txCtx, walletID, stockName)
 		if err != nil {
+			if err == domain.ErrStockNotFound {
+				return domain.ErrInsufficientStock
+			}
 			return err
 		}
 		if walletQty <= 0 {
