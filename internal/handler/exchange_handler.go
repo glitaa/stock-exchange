@@ -17,38 +17,38 @@ func NewExchangeHandler(s *service.ExchangeService) *ExchangeHandler {
 	return &ExchangeHandler{exchangeService: s}
 }
 
-// tradeRequest defines the expected JSON payload for buy and sell operations.
+// tradeRequest defines the expected JSON payload for trade operations.
 type tradeRequest struct {
-	WalletID  string `json:"wallet_id"`
-	StockName string `json:"stock_name"`
+	Type string `json:"type"` // "buy" or "sell"
 }
 
-// BuyStock handles the POST request to buy a stock.
-func (h *ExchangeHandler) BuyStock(w http.ResponseWriter, r *http.Request) {
+// Trade handles the POST request to buy or sell a stock.
+func (h *ExchangeHandler) Trade(w http.ResponseWriter, r *http.Request) {
+	walletID := r.PathValue("wallet_id")
+	stockName := r.PathValue("stock_name")
+
+	if walletID == "" || stockName == "" {
+		respondWithJSON(w, http.StatusBadRequest, ErrorResponse{Error: "wallet_id and stock_name are required"})
+		return
+	}
+
 	var req tradeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondWithJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid request payload"})
 		return
 	}
 
-	err := h.exchangeService.BuyStock(r.Context(), req.WalletID, req.StockName)
-	if err != nil {
-		respondWithError(w, err)
+	var err error
+	switch req.Type {
+	case "buy":
+		err = h.exchangeService.BuyStock(r.Context(), walletID, stockName)
+	case "sell":
+		err = h.exchangeService.SellStock(r.Context(), walletID, stockName)
+	default:
+		respondWithJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid operation type, must be 'buy' or 'sell'"})
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
-}
-
-// SellStock handles the POST request to sell a stock.
-func (h *ExchangeHandler) SellStock(w http.ResponseWriter, r *http.Request) {
-	var req tradeRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondWithJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid request payload"})
-		return
-	}
-
-	err := h.exchangeService.SellStock(r.Context(), req.WalletID, req.StockName)
 	if err != nil {
 		respondWithError(w, err)
 		return

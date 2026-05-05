@@ -49,8 +49,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /buy", exchangeHandler.BuyStock)
-	mux.HandleFunc("POST /sell", exchangeHandler.SellStock)
+	mux.HandleFunc("POST /wallets/{wallet_id}/stocks/{stock_name}", exchangeHandler.Trade)
 
 	mux.HandleFunc("GET /stocks", bankHandler.GetStocks)
 	mux.HandleFunc("POST /stocks", bankHandler.SetStocks)

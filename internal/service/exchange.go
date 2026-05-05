@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/glitaa/stock-exchange/internal/domain"
 )
@@ -25,10 +24,26 @@ func NewExchangeService(walletRepo domain.WalletRepository, bankRepo domain.Bank
 	}
 }
 
+// ensureWalletExists is a helper that creates a wallet if it doesn't already exist.
+func (s *ExchangeService) ensureWalletExists(ctx context.Context, walletID string) error {
+	_, err := s.walletRepo.GetWallet(ctx, walletID)
+	if err != nil {
+		if err == domain.ErrWalletNotFound {
+			return s.walletRepo.CreateWallet(ctx, walletID)
+		}
+		return err
+	}
+	return nil
+}
+
 // BuyStock executes a purchase of a single stock from the bank to the wallet.
-func (s *ExchangeService) BuyStock(ctx context.Context, walletID string, stockName string) error {
+func (s *ExchangeService) BuyStock(ctx context.Context, walletID, stockName string) error {
+	if err := s.ensureWalletExists(ctx, walletID); err != nil {
+		return err
+	}
+
 	return s.txManager.RunInTx(ctx, func(txCtx context.Context) error {
-		bankQty, err := s.ensureTradingPrerequisites(txCtx, walletID, stockName)
+		bankQty, err := s.bankRepo.GetStockQuantity(txCtx, stockName)
 		if err != nil {
 			return err
 		}
@@ -50,14 +65,13 @@ func (s *ExchangeService) BuyStock(ctx context.Context, walletID string, stockNa
 
 // SellStock executes a sale of a single stock from the wallet back to the bank.
 func (s *ExchangeService) SellStock(ctx context.Context, walletID, stockName string) error {
-	return s.txManager.RunInTx(ctx, func(txCtx context.Context) error {
-		_, err := s.ensureTradingPrerequisites(txCtx, walletID, stockName)
-		if err != nil {
-			return err
-		}
+	if err := s.ensureWalletExists(ctx, walletID); err != nil {
+		return err
+	}
 
+	return s.txManager.RunInTx(ctx, func(txCtx context.Context) error {
 		walletQty, err := s.walletRepo.GetStockQuantity(txCtx, walletID, stockName)
-		if err != nil && !errors.Is(err, domain.ErrStockNotFound) {
+		if err != nil {
 			return err
 		}
 		if walletQty <= 0 {
@@ -73,27 +87,6 @@ func (s *ExchangeService) SellStock(ctx context.Context, walletID, stockName str
 
 		return s.logOperation(txCtx, domain.OperationTypeSell, walletID, stockName)
 	})
-}
-
-// ensureTradingPrerequisites validates if the bank has the stock and if the wallet exists, creating the wallet if it doesn't.
-func (s *ExchangeService) ensureTradingPrerequisites(ctx context.Context, walletID, stockName string) (int, error) {
-	bankQty, err := s.bankRepo.GetStockQuantity(ctx, stockName)
-	if err != nil {
-		return 0, err
-	}
-
-	_, err = s.walletRepo.GetWallet(ctx, walletID)
-	if err != nil {
-		if errors.Is(err, domain.ErrWalletNotFound) {
-			if createErr := s.walletRepo.CreateWallet(ctx, walletID); createErr != nil {
-				return 0, createErr
-			}
-		} else {
-			return 0, err
-		}
-	}
-
-	return bankQty, nil
 }
 
 // logOperation adds an entry to the audit log for a given operation.
