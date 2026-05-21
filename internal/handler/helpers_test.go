@@ -46,9 +46,63 @@ func TestRespondWithJSON(t *testing.T) {
 			t.Errorf("expected status %d, got %d", http.StatusInternalServerError, recorder.Code)
 		}
 
-		expectedBody := "{\"error\":\"failed to marshal response\"}\n"
+		expectedBody := "{\"error\":\"failed to marshal response\"}"
 		if recorder.Body.String() != expectedBody {
 			t.Errorf("expected body '%s', got '%s'", expectedBody, recorder.Body.String())
 		}
 	})
+}
+
+func TestRespondWithError(t *testing.T) {
+	tests := []struct {
+		name           string
+		err            error
+		expectedStatus int
+	}{
+		{
+			name:           "Not Found - Stock",
+			err:            domain.ErrStockNotFound,
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name:           "Not Found - Wallet",
+			err:            domain.ErrWalletNotFound,
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name:           "Bad Request - Insufficient Stock",
+			err:            domain.ErrInsufficientStock,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Bad Request - Invalid Operation",
+			err:            domain.ErrInvalidOperation,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Internal Server Error - Generic",
+			err:            errors.New("some unexpected error"),
+			expectedStatus: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			respondWithError(recorder, tt.err)
+
+			if recorder.Code != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, recorder.Code)
+			}
+
+			var response ErrorResponse
+			if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
+				t.Fatalf("failed to decode response body: %v", err)
+			}
+
+			if response.Error != tt.err.Error() {
+				t.Errorf("expected error message '%s', got '%s'", tt.err.Error(), response.Error)
+			}
+		})
+	}
 }
