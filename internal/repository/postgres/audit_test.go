@@ -15,7 +15,7 @@ func TestAuditLogRepository(t *testing.T) {
 	}
 	defer cleanup()
 
-	repo := NewAuditLogRepository(database)
+	repo := NewAuditRepository(database)
 
 	t.Run("Add and GetAll", func(t *testing.T) {
 		clearDB(t, database)
