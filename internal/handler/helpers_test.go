@@ -14,7 +14,7 @@ func TestRespondWithJSON(t *testing.T) {
 	t.Run("successful JSON response", func(t *testing.T) {
 		recorder := httptest.NewRecorder()
 		payload := map[string]string{"message": "success"}
-		
+
 		respondWithJSON(recorder, http.StatusOK, payload)
 
 		if recorder.Code != http.StatusOK {
@@ -39,7 +39,7 @@ func TestRespondWithJSON(t *testing.T) {
 		recorder := httptest.NewRecorder()
 		// Channels cannot be marshaled to JSON
 		payload := make(chan int)
-		
+
 		respondWithJSON(recorder, http.StatusOK, payload)
 
 		if recorder.Code != http.StatusInternalServerError {

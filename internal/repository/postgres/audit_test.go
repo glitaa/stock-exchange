@@ -19,7 +19,7 @@ func TestAuditLogRepository(t *testing.T) {
 
 	t.Run("Add and GetAll", func(t *testing.T) {
 		clearDB(t, database)
-		
+
 		entry := domain.LogEntry{
 			Type:      domain.OperationTypeBuy,
 			WalletID:  "w1",

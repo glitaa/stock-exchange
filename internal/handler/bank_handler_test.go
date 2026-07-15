@@ -32,7 +32,9 @@ func TestBankHandler_GetStocks(t *testing.T) {
 	}
 
 	var payload bankPayload
-	json.NewDecoder(rr.Body).Decode(&payload)
+	if err := json.NewDecoder(rr.Body).Decode(&payload); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 	if len(payload.Stocks) != 1 || payload.Stocks[0].Name != "AAPL" {
 		t.Errorf("expected AAPL stock, got %v", payload.Stocks)
 	}

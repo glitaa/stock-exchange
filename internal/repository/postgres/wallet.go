@@ -43,7 +43,9 @@ func (r *WalletRepository) GetWallet(ctx context.Context, id string) (domain.Wal
 	if err != nil {
 		return domain.Wallet{}, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	var stocks []domain.Stock
 	for rows.Next() {

@@ -19,7 +19,7 @@ func TestWalletRepository(t *testing.T) {
 
 	t.Run("Create and Get Wallet", func(t *testing.T) {
 		clearDB(t, database)
-		
+
 		err := repo.CreateWallet(ctx, "w1")
 		if err != nil {
 			t.Fatalf("expected no err, got %v", err)
@@ -44,7 +44,9 @@ func TestWalletRepository(t *testing.T) {
 
 	t.Run("Update and Get Stock Quantity", func(t *testing.T) {
 		clearDB(t, database)
-		repo.CreateWallet(ctx, "w1")
+		if err := repo.CreateWallet(ctx, "w1"); err != nil {
+			t.Fatalf("failed to create wallet: %v", err)
+		}
 
 		err := repo.UpdateStockQuantity(ctx, "w1", "AAPL", 10)
 		if err != nil {

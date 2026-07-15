@@ -73,8 +73,8 @@ func TestExchangeService_BuyStock(t *testing.T) {
 			t.Fatalf("expected ErrInsufficientStock, got %v", err)
 		}
 	})
-    
-    t.Run("failure - stock not found in bank", func(t *testing.T) {
+
+	t.Run("failure - stock not found in bank", func(t *testing.T) {
 		mockWalletRepo.EXPECT().GetWallet(ctx, "w1").Return(domain.Wallet{}, nil)
 
 		mockTxManager.EXPECT().RunInTx(ctx, gomock.Any()).DoAndReturn(func(ctx context.Context, fn func(context.Context) error) error {
@@ -148,7 +148,7 @@ func TestExchangeService_SellStock(t *testing.T) {
 		mockWalletRepo.EXPECT().GetStockQuantity(ctx, "w1", "AAPL").Return(0, domain.ErrStockNotFound)
 
 		err := svc.SellStock(ctx, "w1", "AAPL")
-		if err != domain.ErrInsufficientStock { 
+		if err != domain.ErrInsufficientStock {
 			t.Fatalf("expected ErrInsufficientStock, got %v", err)
 		}
 	})

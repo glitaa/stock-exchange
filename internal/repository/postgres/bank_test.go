@@ -37,7 +37,9 @@ func TestBankRepository(t *testing.T) {
 	t.Run("Update Stock Quantity", func(t *testing.T) {
 		clearDB(t, database)
 		stocks := []domain.Stock{{Name: "AAPL", Quantity: 100}}
-		repo.SetStocks(ctx, stocks)
+		if err := repo.SetStocks(ctx, stocks); err != nil {
+			t.Fatalf("failed to set stocks: %v", err)
+		}
 
 		err := repo.UpdateStockQuantity(ctx, "AAPL", -10)
 		if err != nil {

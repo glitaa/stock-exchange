@@ -31,7 +31,9 @@ func TestAuditHandler_GetLog(t *testing.T) {
 	}
 
 	var response auditResponse
-	json.NewDecoder(rr.Body).Decode(&response)
+	if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 	if len(response.Log) != 1 {
 		t.Errorf("expected 1 log, got %d", len(response.Log))
 	}
