@@ -32,7 +32,9 @@ func TestWalletHandler_GetWallet(t *testing.T) {
 	}
 
 	var w domain.Wallet
-	json.NewDecoder(rr.Body).Decode(&w)
+	if err := json.NewDecoder(rr.Body).Decode(&w); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 	if w.ID != "w1" {
 		t.Errorf("expected wallet w1, got %v", w.ID)
 	}
@@ -60,7 +62,9 @@ func TestWalletHandler_GetWalletStock(t *testing.T) {
 	}
 
 	var qty int
-	json.NewDecoder(rr.Body).Decode(&qty)
+	if err := json.NewDecoder(rr.Body).Decode(&qty); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 	if qty != 5 {
 		t.Errorf("expected 5, got %d", qty)
 	}
