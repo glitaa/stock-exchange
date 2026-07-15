@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/exchange-server ./cmd/server/main.
 # ==========================================
 # Final Stage
 # ==========================================
-FROM alpine:3.23
+FROM alpine:3.24
 
 # Install CA certificates for secure HTTPS connections if needed
 RUN apk --no-cache add ca-certificates
