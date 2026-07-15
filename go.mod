@@ -3,7 +3,7 @@ module github.com/glitaa/stock-exchange
 go 1.26
 
 require (
-	github.com/jackc/pgx/v5 v5.9.2
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/testcontainers/testcontainers-go v0.43.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.43.0
 	go.uber.org/mock v0.6.0
