@@ -40,7 +40,7 @@ func TestExchangeHandler_Trade(t *testing.T) {
 		req.SetPathValue("wallet_id", "w1")
 		req.SetPathValue("stock_name", "AAPL")
 		rr := httptest.NewRecorder()
-		
+
 		h.Trade(rr, req)
 
 		if rr.Code != http.StatusOK {
@@ -53,7 +53,7 @@ func TestExchangeHandler_Trade(t *testing.T) {
 		req.SetPathValue("wallet_id", "w1")
 		req.SetPathValue("stock_name", "AAPL")
 		rr := httptest.NewRecorder()
-		
+
 		h.Trade(rr, req)
 
 		if rr.Code != http.StatusBadRequest {
