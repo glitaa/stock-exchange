@@ -2,6 +2,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go)](https://go.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker)](https://www.docker.com/)
+[![CI](https://github.com/glitaa/stock-exchange/actions/workflows/ci.yml/badge.svg)](https://github.com/glitaa/stock-exchange/actions/workflows/ci.yml)
 
 A simplified, highly available stock exchange simulation service built in Go.
 
