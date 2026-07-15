@@ -29,7 +29,9 @@ func InitSchema(ctx context.Context, db *sql.DB) error {
 		return err
 	}
 
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(1);")
 	if err != nil {

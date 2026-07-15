@@ -42,7 +42,9 @@ func (r *BankRepository) GetStocks(ctx context.Context) ([]domain.Stock, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	var stocks []domain.Stock
 	for rows.Next() {

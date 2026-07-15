@@ -42,8 +42,8 @@ func setupTestDB(ctx context.Context) (*sql.DB, func(), error) {
 	}
 
 	cleanup := func() {
-		database.Close()
-		pgContainer.Terminate(context.Background())
+		_ = database.Close()
+		_ = pgContainer.Terminate(context.Background())
 	}
 
 	return database, cleanup, nil

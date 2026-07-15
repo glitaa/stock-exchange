@@ -47,7 +47,9 @@ func (r *AuditRepository) GetAll(ctx context.Context) ([]domain.LogEntry, error)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	var logs []domain.LogEntry
 	for rows.Next() {

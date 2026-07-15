@@ -26,7 +26,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannot connect to database: %v", err)
 	}
-	defer dbConn.Close()
+	defer func() {
+		_ = dbConn.Close()
+	}()
 
 	if err := db.InitSchema(context.Background(), dbConn); err != nil {
 		log.Fatalf("Cannot initialize database schema: %v", err)
