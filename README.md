@@ -133,3 +133,7 @@ go test -v ./...
 ```
 
 *(Note: Integration tests will automatically spin up an isolated PostgreSQL container for database assertions and clean it up afterward.)*
+
+## License
+
+This project is available under the MIT License. See [LICENSE](LICENSE) for details.
