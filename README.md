@@ -10,7 +10,7 @@ A simplified, highly available stock exchange simulation service built in Go.
 
 This project simulates a basic stock market ecosystem consisting of a **Bank** and user **Wallets**. It provides a robust RESTful API to manage stock inventories, trade assets (buy/sell), and audit transactions.
 
-The application is designed to be highly available (HA), utilizing a multi-instance Go backend load-balanced via NGINX, and backed by a PostgreSQL database with strict transactional integrity.
+The application is designed to be highly available, utilizing a multi-instance Go backend load-balanced via NGINX, and backed by a PostgreSQL database with strict transactional integrity. This setup demonstrates application-replica failover rather than complete infrastructure-level high availability. NGINX and PostgreSQL remain single points of failure in the local Docker Compose environment.
 
 ## Features
 
@@ -101,9 +101,28 @@ curl -X POST http://localhost:8080/chaos
 # The Docker daemon will automatically restart the crashed container.
 ```
 
+## Architecture
+
+The service follows a layered structure:
+
+- [cmd/server](cmd/server) — application startup and dependency wiring,
+- [internal/domain](internal/domain) — stock, wallet and audit models and domain errors,
+- [internal/service](internal/service) — bank, wallet, exchange and audit workflows,
+- [internal/repository](internal/repository) — repository interfaces,
+- [internal/db](internal/db) — PostgreSQL implementations and transaction management,
+- [internal/handler](internal/handler) — HTTP routing, validation and JSON responses.
+
+PostgreSQL serves as the shared state and synchronization point for both application replicas.
+
+## Transactional Consistency
+
+Buy and sell operations execute within PostgreSQL transactions. The application uses PostgreSQL advisory locking to serialize conflicting stock operations across backend replicas to prevent lost updates or negative stock quantities.
+
+No in-memory synchronization is used because each backend runs in a separate container.
+
 ## Testing
 
-The project includes a comprehensive suite of unit and integration tests.
+The project includes automated unit and integration tests.
 
 ### Running Tests
 
